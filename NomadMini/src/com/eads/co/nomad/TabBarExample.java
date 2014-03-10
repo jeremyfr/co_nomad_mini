@@ -12,7 +12,17 @@ public class TabBarExample extends TabActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.tab);
-        
+        Bundle infos = this.getIntent().getExtras();
+		String fsn = infos.getString("FSN");
+		String msn = infos.getString("MSN");
+		String id = infos.getString("ID");
+		String plane = infos.getString("Avion");
+		
+		getActionBar().setDisplayHomeAsUpEnabled(true);
+		String title = "ATA Selection   /   Plane:" + plane + " MSN:" + msn + " FSN:"
+				+ fsn + " ID:" + id;
+		setTitle(title);
+		
         /* TabHost will have Tabs */
         TabHost tabHost = (TabHost)findViewById(android.R.id.tabhost);
         
@@ -26,7 +36,13 @@ public class TabBarExample extends TabActivity {
         
         /* TabSpec setIndicator() is used to set name for the tab. */
         /* TabSpec setContent() is used to set content for a particular tab. */
-        firstTabSpec.setIndicator("First Tab Name").setContent(new Intent(this,ATASelection.class));
+        Intent ATASelection = new Intent(this, ATASelection.class);
+        ATASelection.putExtra("Avion", plane);
+        ATASelection.putExtra("FSN", fsn);
+        ATASelection.putExtra("MSN", msn);
+        ATASelection.putExtra("ID", id);
+        
+        firstTabSpec.setIndicator("First Tab Name").setContent(ATASelection);
         secondTabSpec.setIndicator("Second Tab Name").setContent(new Intent(this,Plane3D.class));
         
         /* Add tabSpec to the TabHost to display. */

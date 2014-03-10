@@ -31,7 +31,6 @@ public class ATASelection extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		getActionBar().setDisplayHomeAsUpEnabled(true);
 		String msn, fsn, id, plane;
 		Bundle infos = this.getIntent().getExtras();
 		fsn = infos.getString("FSN");
