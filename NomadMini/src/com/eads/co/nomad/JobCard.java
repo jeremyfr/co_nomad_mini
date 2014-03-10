@@ -228,10 +228,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				switch (state) {
 				case NOT_DISPLAYED:
 					break;
-				case DISPLAYED_FREE:
-					break;
-				case DISPLAYED_PRESSED:
-					break;
 				case DISPLAYED_FULLSCREEN:
 					supprimeElt(titreAnnexe.getText().toString(), clickedWB);
 					break;
@@ -245,10 +241,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 			public void onClick(View v) {
 				switch (state) {
 				case NOT_DISPLAYED:
-					break;
-				case DISPLAYED_FREE:
-					break;
-				case DISPLAYED_PRESSED:
 					break;
 				case DISPLAYED_FULLSCREEN:
 					setAnnexeX(xmax + xseparator / 3);
@@ -560,17 +552,13 @@ public class JobCard extends Activity implements PropertyChangeListener,
 					clickedWB);
 			state = AnnexesState.DISPLAYED_FULLSCREEN;
 			break;
-		case DISPLAYED_FREE:
-			break;
-		case DISPLAYED_PRESSED:
-			break;
 		case DISPLAYED_FULLSCREEN:
 			break;
 		}
 	}
 
 	private void getWidthHeight() {
-		// RÃ©cupÃ©ration de la largeur et de la hauteur du layout.
+		// Récupération de la largeur et de la hauteur du layout.
 		Timer t = new Timer();
 		class SetMax extends TimerTask {
 			@Override
@@ -582,7 +570,7 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		t.schedule(new SetMax(), t2);
 	}
 
-	// Fonction pour supprimer tout les Ã©lÃ©ments de la liste
+	// Fonction pour supprimer tout les éléments de la liste
 	private void supprimeTout() {
 		listItem = new ArrayList<HashMap<String, Object>>();
 		listview.invalidateViews();
@@ -596,8 +584,8 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		state = AnnexesState.NOT_DISPLAYED;
 	}
 
-	// Fonction qui supprime un Ã©lÃ©ment de la listview et agit en consÃ©quence
-	// suivant la prÃ¨sence d'autres annexes
+	// Fonction qui supprime un élément de la listview et agit en conséquence
+	// suivant la prèsence d'autres annexes
 	private void supprimeElt(String titre, WebView wb) {
 		if (listItem.size() != 2) {
 			int indice = trouveDansListe(titre, wb);

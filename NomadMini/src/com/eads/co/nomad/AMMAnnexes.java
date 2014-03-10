@@ -24,15 +24,11 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.webkit.WebView;
@@ -45,7 +41,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -57,7 +52,7 @@ import com.eads.co.nomad.R.color;
  * Class used to manage the display of the documentation.
  * 
  * @author Nicolas Bruniquel
- * @author J√©r√©my Fricou
+ * @author JÈrÈmy Fricou
  * @author Florian Lefebvre
  * @author Benjamin Louradour
  * @author Guillaume Saas
@@ -75,11 +70,11 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 
 	private static int xmax; // largeur maximale de la zone de texte ou de
 								// l'annexe.
-	private static int ymax; // ordonn√©e d'apparition de la fl√®che basse.
+	private static int ymax; // ordonnÈe d'apparition de la flËche basse.
 
-	private static int xseparator = 0; // largeur de la barre de s√©paration.
+	private static int xseparator = 0; // largeur de la barre de sÈparation.
 
-	private static int t2 = 200; // temps avant de r√©cup√©rer largeur et hauteur.
+	private static int t2 = 200; // temps avant de rÈcupÈrer largeur et hauteur.
 
 	private ScrollView scrollView;
 	
@@ -95,7 +90,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 	private LinearLayout warnings, jobSetUp, procedure, closeUp, tools,
 			pictures;
 
-	private WebView clickedWB; // WebView contenant le lien de l'annexe cliqu√©e.
+	private WebView clickedWB; // WebView contenant le lien de l'annexe cliquÈe.
 	private String annexe; // Nom de l'annexe.
 
 	private LinearLayout annexLayout; // layout de l'annexe.
@@ -107,7 +102,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 	private DrawerLayout mDrawerLayout;
 	private ListView listview;
 
-	// Cr√©ation de la ArrayList qui nous permettra de remplir la listView
+	// CrÈation de la ArrayList qui nous permettra de remplir la listView
 	ArrayList<HashMap<String, Object>> listItem;
 	HashMap<String, Object> map;
 
@@ -117,7 +112,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 
 	private String title;
 
-	public AnnexesState state = AnnexesState.NOT_DISPLAYED; // √©tat de l'annexe.
+	public AnnexesState state = AnnexesState.NOT_DISPLAYED; // Ètat de l'annexe.
 
 	@Override
 	public void onConfigurationChanged(Configuration newConfig) {
@@ -164,7 +159,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerLockMode(1, Gravity.END);
 
-		// R√©cup√©ration de la largeur et de la hauteur du layout
+		// RÈcupÈration de la largeur et de la hauteur du layout
 		getWidthHeight();
 
 		map = new HashMap<String, Object>();
@@ -184,7 +179,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 					HashMap<String, Object> map = (HashMap<String, Object>) listview
 							.getItemAtPosition(position);
 					annexe = (String) map.get("titre");
-					Log.e("AnnexeListener", "Nom de l'annexe cliqu√©e" + annexe);
 					titreAnnexe.setText(annexe);
 					int resID = getResources()
 							.getIdentifier((String) map.get("img"), "drawable",
@@ -208,10 +202,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 				switch (state) {
 				case NOT_DISPLAYED:
 					break;
-				case DISPLAYED_FREE:
-					break;
-				case DISPLAYED_PRESSED:
-					break;
 				case DISPLAYED_FULLSCREEN:
 					supprimeElt(titreAnnexe.getText().toString(), clickedWB);
 					break;
@@ -225,10 +215,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 			public void onClick(View v) {
 				switch (state) {
 				case NOT_DISPLAYED:
-					break;
-				case DISPLAYED_FREE:
-					break;
-				case DISPLAYED_PRESSED:
 					break;
 				case DISPLAYED_FULLSCREEN:
 					setAnnexeX(xmax + xseparator / 3);
@@ -432,7 +418,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 	}
 
 	public void onAnnexeClic(WebView webView, String annexe) {
-		Log.i("AMMAnnexes", "Clic Annexe : " + annexe);
 		switch (state) {
 		case NOT_DISPLAYED:
 			this.annexe = annexe;
@@ -447,17 +432,13 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 					clickedWB);
 			state = AnnexesState.DISPLAYED_FULLSCREEN;
 			break;
-		case DISPLAYED_FREE:
-			break;
-		case DISPLAYED_PRESSED:
-			break;
 		case DISPLAYED_FULLSCREEN:
 			break;
 		}
 	}
 
 	private void getWidthHeight() {
-		// R√©cup√©ration de la largeur et de la hauteur du layout.
+		// RÈcupÈration de la largeur et de la hauteur du layout.
 		Timer t = new Timer();
 		class SetMax extends TimerTask {
 			@Override
@@ -469,7 +450,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 		t.schedule(new SetMax(), t2);
 	}
 
-	// Fonction pour supprimer tout les √©l√©ments de la liste
+	// Fonction pour supprimer tout les ÈlÈments de la liste
 	private void supprimeTout() {
 		listItem = new ArrayList<HashMap<String, Object>>();
 		listview.invalidateViews();
@@ -483,8 +464,8 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 		state = AnnexesState.NOT_DISPLAYED;
 	}
 
-	// Fonction qui supprime un √©l√©ment de la listview et agit en cons√©quence
-	// suivant la pr√®sence d'autres annexes
+	// Fonction qui supprime un ÈlÈment de la listview et agit en consÈquence
+	// suivant la prËsence d'autres annexes
 	private void supprimeElt(String titre, WebView wb) {
 		if (listItem.size() != 2) {
 			int indice = trouveDansListe(titre, wb);
@@ -503,7 +484,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 		}
 	}
 
-	// Fonction pour trouver l'indice de l'√©l√©ment titre.
+	// Fonction pour trouver l'indice de l'ÈlÈment titre.
 	private int trouveDansListe(String titre, WebView wb) {
 		Iterator<HashMap<String, Object>> iterateur = listItem.iterator();
 		int numero = 0;
@@ -529,7 +510,7 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 		return test;
 	}
 
-	// Ajoute l'√©l√©ment titre avec sont image a la listview
+	// Ajoute l'ÈlÈment titre avec sont image a la listview
 	private void ajouteList(String titre, String img, WebView wb) {
 		if (!testeObjetDansListe(titre, wb)) {
 			map = new HashMap<String, Object>();
@@ -537,8 +518,8 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 			map.put("img", img);
 			map.put("webview", wb);
 			listItem.add(map);
-			// Cr√©ation d'un SimpleAdapter qui se chargera de mettre les items
-			// pr√©sent dans notre list (listItem) dans la vue affichage_annexes
+			// CrÈation d'un SimpleAdapter qui se chargera de mettre les items
+			// prÈsent dans notre list (listItem) dans la vue affichage_annexes
 			SimpleAdapter mSchedule = new SimpleAdapter(this.getBaseContext(),
 					listItem, R.layout.affiche_annexes, new String[] { "img",
 							"titre" }, new int[] { R.id.listImage,
@@ -738,7 +719,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		Log.e("Dans propertyChange", "Cool");
 		if (event.getNewValue().equals("FULLSCREEN")) {
 			fullScreenAnnexButton.performClick();
 		}
