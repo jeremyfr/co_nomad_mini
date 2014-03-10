@@ -2,14 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:orientation="vertical" 
-    android:background="@drawable/tab_bg_selector">
+    android:background="@drawable/tab_bg_selector"
+    android:orientation="vertical" >
 
     <TextView
         android:id="@+id/tabTitle"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:textSize="@dimen/font_size_3"
-        android:textAppearance="?android:attr/textAppearanceLarge" />
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textSize="@dimen/font_size_3" />
 
 </LinearLayout>

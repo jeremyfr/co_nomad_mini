@@ -58,7 +58,8 @@ public class MenuApp extends Activity {
 	}
 
 	public void toIPC(View view) {
-		Toast.makeText(this, "Non implémenté", Toast.LENGTH_LONG).show();
+		Intent intent = new Intent(this, TabBarExample.class);
+		startActivity(intent);
 	}
 
 	public void toJobCard(View view) {
