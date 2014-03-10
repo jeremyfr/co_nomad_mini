@@ -24,7 +24,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="FirstTab" />
         <activity android:name="TabBarExample" />
         <activity
             android:name="com.eads.co.nomad.MenuApp"

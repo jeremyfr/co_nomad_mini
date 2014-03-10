@@ -26,7 +26,7 @@ public class TabBarExample extends TabActivity {
         
         /* TabSpec setIndicator() is used to set name for the tab. */
         /* TabSpec setContent() is used to set content for a particular tab. */
-        firstTabSpec.setIndicator("First Tab Name").setContent(new Intent(this,FirstTab.class));
+        firstTabSpec.setIndicator("First Tab Name").setContent(new Intent(this,ATASelection.class));
         secondTabSpec.setIndicator("Second Tab Name").setContent(new Intent(this,Plane3D.class));
         
         /* Add tabSpec to the TabHost to display. */
