@@ -225,77 +225,15 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 								+ "')");
 						scrollView.setAnnexe(clickedWB, annexe);
 					}
+					scrollX = scrollView.getScrollX();
+					scrollY = scrollView.getScrollY();
+					setAnnexeX(xseparator / 3);
+					state = AnnexesState.DISPLAYED_FULLSCREEN;
 				}
 
 			}
 		});
 
-		// Listener sur l'infobulle.
-		infobulle.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				int y = y_absolue - scrollView.getScrollY();
-				if (y < ymin || y > ymax) {
-					scrollTo(y_absolue);
-				}
-			}
-		});
-
-		// Listener sur la barre verticale.
-		layout.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_DOWN: // PRESS
-					switch (state) {
-					case NOT_DISPLAYED:
-						break;
-					case DISPLAYED_FREE:
-						if (event.getX() >= x - 100 && event.getX() <= x + 100) {
-							state = AnnexesState.DISPLAYED_PRESSED;
-						}
-						break;
-					case DISPLAYED_PRESSED:
-						break;
-					case DISPLAYED_FULLSCREEN:
-						break;
-					}
-					break;
-				case MotionEvent.ACTION_MOVE: // MOVE
-					switch (state) {
-					case NOT_DISPLAYED:
-						break;
-					case DISPLAYED_FREE:
-						break;
-					case DISPLAYED_PRESSED:
-						if (event.getX() >= xmin && event.getX() <= xmax - xmin) {
-							setAnnexeXAndX((int) event.getX());
-						}
-						clickedWB.loadUrl("javascript:getPosition('" + annexe
-								+ "')");
-						state = AnnexesState.DISPLAYED_PRESSED;
-						break;
-					case DISPLAYED_FULLSCREEN:
-						break;
-					}
-					break;
-				case MotionEvent.ACTION_UP: // RELEASE
-					switch (state) {
-					case NOT_DISPLAYED:
-						break;
-					case DISPLAYED_FREE:
-						break;
-					case DISPLAYED_PRESSED:
-						state = AnnexesState.DISPLAYED_FREE;
-						break;
-					case DISPLAYED_FULLSCREEN:
-						break;
-					}
-					break;
-				}
-				return true;
-			}
-		});
 
 		// Listener sur le bouton fermer.
 		closeAnnexButton.setOnClickListener(new View.OnClickListener() {
@@ -305,7 +243,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 				case NOT_DISPLAYED:
 					break;
 				case DISPLAYED_FREE:
-					supprimeElt(titreAnnexe.getText().toString(), clickedWB);
 					break;
 				case DISPLAYED_PRESSED:
 					break;
@@ -324,27 +261,14 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 				case NOT_DISPLAYED:
 					break;
 				case DISPLAYED_FREE:
-					hideSeparator();
-					scrollX = scrollView.getScrollX();
-					scrollY = scrollView.getScrollY();
-					setAnnexeX(xseparator / 3);
-					fullScreenAnnexButton
-							.setImageResource(R.drawable.btn_offscreen);
-					state = AnnexesState.DISPLAYED_FULLSCREEN;
 					break;
 				case DISPLAYED_PRESSED:
 					break;
 				case DISPLAYED_FULLSCREEN:
-					displaySeparator();
-					setAnnexeX(x);
+					setAnnexeX(xmax + xseparator / 3);
 					scrollView.setScrollX(scrollX);
 					scrollView.setScrollY(scrollY);
-					fullScreenAnnexButton
-							.setImageResource(R.drawable.btn_fullscreen);
-					clickedWB.loadUrl("javascript:getPosition('" + annexe
-							+ "')");
-					scrollView.setAnnexe(clickedWB, annexe);
-					state = AnnexesState.DISPLAYED_FREE;
+					state = AnnexesState.NOT_DISPLAYED;
 					break;
 				}
 			}
@@ -489,41 +413,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 				onHistoricItemClick(position);
 			}
 		});
-
-		Thread t = new Thread() {
-
-			@Override
-			public void run() {
-				try {
-					while (!isInterrupted()) {
-						Thread.sleep(t1);
-						runOnUiThread(new Runnable() {
-							@Override
-							public void run() {
-								switch (state) {
-								case NOT_DISPLAYED:
-									break;
-								case DISPLAYED_FREE:
-									clickedWB
-											.loadUrl("javascript:getPosition('"
-													+ annexe + "')");
-									break;
-								case DISPLAYED_PRESSED:
-									clickedWB
-											.loadUrl("javascript:getPosition('"
-													+ annexe + "')");
-									break;
-								case DISPLAYED_FULLSCREEN:
-									break;
-								}
-							}
-						});
-					}
-				} catch (InterruptedException e) {
-				}
-			}
-		};
-		t.start();
 	}
 
 	private void displayLastRevision(String procedure) {
@@ -694,51 +583,20 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 		Log.i("AMMAnnexes", "Clic Annexe : " + annexe);
 		switch (state) {
 		case NOT_DISPLAYED:
-			setAnnexeX(x);
-			scrollView.setAnnexe(webView, annexe);
+			hideSeparator();
 			this.annexe = annexe;
 			clickedWB = webView;
-			clickedWB.loadUrl("javascript:getPosition('" + annexe + "')");
+			scrollX = scrollView.getScrollX();
+			scrollY = scrollView.getScrollY();
+			setAnnexeX(xseparator / 3);
 			// Image a changer
 			ajouteList(annexe, String.valueOf(R.drawable.ata), clickedWB);
 			// Image a changer
 			setTitleAndImgAnnexe(annexe, String.valueOf(R.drawable.ata),
 					clickedWB);
-			// Mise à jour de la position dans la doc.
-			Timer t_ouverture = new Timer();
-			class ScrollTo extends TimerTask {
-				@Override
-				public void run() {
-					runOnUiThread(new Runnable() {
-						public void run() {
-							scrollTo(y_absolue);
-						}
-					});
-				}
-			}
-			t_ouverture.schedule(new ScrollTo(), t3);
-			state = AnnexesState.DISPLAYED_FREE;
+			state = AnnexesState.DISPLAYED_FULLSCREEN;
 			break;
 		case DISPLAYED_FREE:
-			if (testeActuel(annexe, webView) && nb_annexe == 1) {
-				setAnnexeX(xmax + xseparator / 3);
-				supprimeElt(annexe, webView);
-				state = AnnexesState.NOT_DISPLAYED;
-			} else if (testeActuel(annexe, webView)) {
-				supprimeElt(annexe, webView);
-				state = AnnexesState.DISPLAYED_FREE;
-			} else {
-				scrollView.setAnnexe(webView, annexe);
-				this.annexe = annexe;
-				clickedWB = webView;
-				clickedWB.loadUrl("javascript:getPosition('" + annexe + "')");
-				// Image a changer
-				ajouteList(annexe, String.valueOf(R.drawable.ata), clickedWB);
-				// Image a changer
-				setTitleAndImgAnnexe(annexe, String.valueOf(R.drawable.ata),
-						clickedWB);
-				state = AnnexesState.DISPLAYED_FREE;
-			}
 			break;
 		case DISPLAYED_PRESSED:
 			break;
@@ -786,7 +644,6 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 					"Indice de l'item : " + trouveDansListe(titre, wb));
 			int indice = trouveDansListe(titre, wb);
 			listItem.remove(indice - 1);
-			Log.w("SupprimeElt", "Taille de listItem : " + listItem.size());
 			nb_annexe--;
 			listview.invalidateViews();
 			int position = 1;
@@ -794,15 +651,11 @@ public class AMMAnnexes extends Activity implements PropertyChangeListener,
 					listview.getAdapter().getView(position, null, null),
 					position, position);
 		} else {
-			Log.e("SupprimeElt",
-					"Indice de l'item : " + trouveDansListe(titre, wb));
 			listItem.remove(trouveDansListe(titre, wb) - 1);
 			listview.invalidateViews();
 			nb_annexe--;
 			setAnnexeX(xmax + xseparator / 3);
 			mDrawerLayout.setDrawerLockMode(1, Gravity.END);
-			displaySeparator();
-			fullScreenAnnexButton.setImageResource(R.drawable.btn_fullscreen);
 			state = AnnexesState.NOT_DISPLAYED;
 		}
 	}

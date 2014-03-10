@@ -614,7 +614,7 @@
                             android:layout_height="wrap_content"
                             android:layout_alignParentRight="true"
                             android:background="@null"
-                            android:src="@drawable/btn_fullscreen" />
+                            android:src="@drawable/btn_offscreen" />
                     </RelativeLayout>
                 </LinearLayout>
             </LinearLayout>
