@@ -22,7 +22,7 @@
         android:layout_height="fill_parent"
         android:orientation="horizontal" >
 
-        <com.eads.co.nomad.OurScrollView
+        <ScrollView
             android:id="@+id/scrollView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" >
@@ -519,44 +519,9 @@
                     </LinearLayout>
                 </LinearLayout>
             </LinearLayout>
-        </com.eads.co.nomad.OurScrollView>
+        </ScrollView>
 
  <!-- Info bulle -->
-
-                <RelativeLayout
-                    android:id="@+id/separatorLayout"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent" >
-
-                    <ImageView
-                        android:id="@+id/separator"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:scaleType="matrix"
-                        android:src="@drawable/vertical_line" />
-
-                    <ImageView
-                        android:id="@+id/separator_up"
-                        android:layout_width="wrap_content"
-                        android:layout_height="match_parent"
-                        android:scaleType="matrix"
-                        android:src="@drawable/vertical_line_up" />
-
-                    <ImageView
-                        android:id="@+id/separator_down"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:scaleType="matrix"
-                        android:src="@drawable/vertical_line_down" />
-
-                    <ImageView
-                        android:id="@+id/infobulle"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:scaleType="matrix"
-                        android:src="@drawable/infobulle" />
-                </RelativeLayout>
 
                 <LinearLayout
                     android:id="@+id/annexLayout"

@@ -20,12 +20,10 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
@@ -44,7 +42,6 @@ import android.widget.LinearLayout;
 import android.widget.SimpleAdapter;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
@@ -82,7 +79,7 @@ public class JobCard extends Activity implements PropertyChangeListener,
 	Step s;
 	StepListAdapterProcedure stepAdaptProc;
 	PreviousStepListAdapterProcedure stepAdaptPreviousProc;
-	String head = "<html><head><meta name=\"viewport\" content=\"minimum-scale=1\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\"/><script type=\"text/javascript\">function getPosition(element){var curtop = 0;var obj = document.getElementById(element); if (obj.offsetParent) {	do {curtop += 2*obj.offsetTop;	} while (obj = obj.offsetParent);}MyAndroid.receiveValueFromJs(curtop);}</script></head><body>";
+	String head = "<html><head><meta name=\"viewport\" content=\"minimum-scale=1\" /><link rel=\"stylesheet\" type=\"text/css\" href=\"css/style.css\"/></head><body>";
 	String endbody = "</body></html>";
 	StepListAdapterWarn stepAdaptWarn;
 	PreviousStepListAdapterWarn stepAdaptPreviousWarn;
@@ -96,21 +93,14 @@ public class JobCard extends Activity implements PropertyChangeListener,
 
 	private DataParsing parser;
 
-	private int x; // abscisse de la séparation entre la zone de texte et
-					// l'annexe.
+
 	private static int xmax; // largeur maximale de la zone de texte ou de
 								// l'annexe.
 	private static int ymax; // ordonnée d'apparition de la flèche basse.
-	private static int xmin; // largeur minimale de la zone de texte ou de
-								// l'annexe.
-	private static int ymin; // ordonnée d'apparition de la flèche haute.
-	private static int xseparator = 160; // largeur de la barre de séparation.
-	private static int yinfobulle = 331; // hauteur de l'image infobulle.
 
-	private static int t1 = 50; // fréquence de rafraichissement du pointeur.
+	private static int xseparator = 0; // largeur de la barre de séparation.
+
 	private static int t2 = 200; // temps avant de récupérer largeur et hauteur.
-	private static int t3 = 300; // temps avant de mettre le scroll au bon
-									// endroit après ouverture d'une annexe.
 
 	private int scrollX;
 	private int scrollY;
@@ -118,7 +108,7 @@ public class JobCard extends Activity implements PropertyChangeListener,
 	private LinearLayout layout; // layout global contenant documentation et
 									// annexes.
 
-	private OurScrollView scrollView; // scrollview contenant la documentation.
+	private ScrollView scrollView; // scrollview contenant la documentation.
 
 	private WebView warningWV, jobSetUpWV, procedureWV, closeUpWV, toolsWV,
 			picturesWV;
@@ -128,12 +118,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 
 	private WebView clickedWB; // WebView contenant le lien de l'annexe cliquée.
 	private String annexe; // Nom de l'annexe.
-	private int y_absolue; // Position du lien vers l'annexe dans scrollView.
-
-	private RelativeLayout separatorLayout; // layout de la barre verticale.
-	private ImageView separator_up; // barre verticale haute.
-	private ImageView separator_down; // barre verticale basse.
-	private ImageView infobulle; // image de l'infobulle.
 
 	private LinearLayout annexLayout; // layout de l'annexe.
 	private TextView titreAnnexe; // titre de l'annexe
@@ -143,7 +127,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 	// Pour les annexes multiples
 	private DrawerLayout mDrawerLayout;
 	private ListView listview;
-	private int nb_annexe;
 
 	// Création de la ArrayList qui nous permettra de remplir la listView
 	ArrayList<HashMap<String, Object>> listItem;
@@ -179,13 +162,7 @@ public class JobCard extends Activity implements PropertyChangeListener,
 
 		layout = (LinearLayout) findViewById(R.id.layout_jobcard);
 
-		separatorLayout = (RelativeLayout) findViewById(R.id.separatorLayout);
-		separator_up = (ImageView) findViewById(R.id.separator_up);
-		separator_down = (ImageView) findViewById(R.id.separator_down);
-		infobulle = (ImageView) findViewById(R.id.infobulle);
-
-		scrollView = (OurScrollView) findViewById(R.id.scrollView);
-		scrollView.setActivity(this);
+		scrollView = (ScrollView) findViewById(R.id.scrollView);
 
 		annexLayout = (LinearLayout) findViewById(R.id.annexLayout);
 		titreAnnexe = (TextView) findViewById(R.id.annexTitle);
@@ -207,18 +184,9 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		// Remplissage des fonctions sur le navigation drawer
 		mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
 		mDrawerLayout.setDrawerLockMode(1, Gravity.END);
-		nb_annexe = 0;
 
 		// Récupération de la largeur et de la hauteur du layout
 		getWidthHeight();
-
-		// Scroll lors d'un clic sur le titre de l'annexe.
-		titreAnnexe.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				scrollTo(y_absolue);
-			}
-		});
 
 		map = new HashMap<String, Object>();
 		map.put("titre", "Close All");
@@ -237,18 +205,12 @@ public class JobCard extends Activity implements PropertyChangeListener,
 					HashMap<String, Object> map = (HashMap<String, Object>) listview
 							.getItemAtPosition(position);
 					annexe = (String) map.get("titre");
-					Log.e("AnnexeListener", "Nom de l'annexe cliquÃ©e" + annexe);
 					titreAnnexe.setText(annexe);
 					int resID = getResources()
 							.getIdentifier((String) map.get("img"), "drawable",
 									"package.name");
 					annexImg.setImageResource(resID);
 					clickedWB = (WebView) map.get("webview");
-					if (state != AnnexesState.DISPLAYED_FULLSCREEN) {
-						clickedWB.loadUrl("javascript:getPosition('" + annexe
-								+ "')");
-						scrollView.setAnnexe(clickedWB, annexe);
-					}
 					scrollX = scrollView.getScrollX();
 					scrollY = scrollView.getScrollY();
 					setAnnexeX(xseparator / 3);
@@ -522,8 +484,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 					parser.getTools(), "text/html", "UTF-8", null);
 			toolsWV.setWebViewClient(taskManager);
 			toolsWV.getSettings().setJavaScriptEnabled(true);
-			toolsWV.addJavascriptInterface(new JavaScriptInterface(this),
-					"MyAndroid");
 			/* Pictures part */
 			pictures = (LinearLayout) findViewById(R.id.pictures);
 			pictures.setOnClickListener(managePictures);
@@ -538,8 +498,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 					parser.getPictures(), "text/html", "UTF-8", null);
 			picturesWV.setWebViewClient(taskManager);
 			picturesWV.getSettings().setJavaScriptEnabled(true);
-			picturesWV.addJavascriptInterface(new JavaScriptInterface(this),
-					"MyAndroid");
 			picturesWV.getLayoutParams().height = pictures.getLayoutParams().height;
 		} catch (Exception e) {
 			ammPart = ammPart.substring(ammPart.lastIndexOf('/') + 1);
@@ -565,11 +523,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		});
 	}
 
-	// Scroll à une ordonnée de la documentation.
-	private void scrollTo(int y) {
-		scrollView.scrollTo(scrollView.getScrollX(), y - yinfobulle / 2);
-	}
-
 	// Affiche l'annexe.
 	private void setAnnexeX(int x) {
 		mDrawerLayout.setDrawerLockMode(0, Gravity.END);
@@ -578,12 +531,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		annexLayout.setLayoutParams(new LayoutParams(xmax - x - xseparator / 3,
 				ymax));
 		// setInfobulle();
-	}
-
-	// Affiche l'annexe et met l'abscisse du séparateur.
-	private void setAnnexeXAndX(int _x) {
-		setAnnexeX(x);
-		x = _x;
 	}
 
 	// Affiche le titre de l'annexe et met l'image de l'annexe
@@ -598,102 +545,9 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				position);
 	}
 
-	// Affiche le séparateur et l'infobulle.
-	private void displaySeparator() {
-		separatorLayout.setVisibility(View.VISIBLE);
-	}
-
-	// Cache le séparateur et l'infobulle.
-	private void hideSeparator() {
-		separatorLayout.setVisibility(View.INVISIBLE);
-
-	}
-
-	// Place l'infobulle selon l'ordonnée y relative à la WebView contenant le
-	// lien vers l'annexe.
-	public void setInfobulle(int y) {
-
-		if (clickedWB.equals(warningWV)) {
-			setInfobulle(!isCollapsed(R.id.stateWarning), y, 0);
-		}
-
-		if (clickedWB.equals(jobSetUpWV)) {
-			setInfobulle(!isCollapsed(R.id.stateJobSetUp), y, 1);
-		}
-
-		if (clickedWB.equals(procedureWV)) {
-			setInfobulle(!isCollapsed(R.id.stateProcedure), y, 2);
-		}
-
-		if (clickedWB.equals(closeUpWV)) {
-			setInfobulle(!isCollapsed(R.id.stateCloseUp), y, 3);
-		}
-
-		if (clickedWB.equals(toolsWV)) {
-			setInfobulle(!isCollapsed(R.id.stateTools), y, 4);
-		}
-
-		if (clickedWB.equals(picturesWV)) {
-			setInfobulle(!isCollapsed(R.id.statePictures), y, 5);
-		}
-	}
-
-	private void setInfobulle(boolean state, int y, int pos) {
-		if (state) {
-			y_absolue = 96 + 30 * pos + warnings.getHeight()
-					+ (pos >= 1 ? 1 : 0) * jobSetUp.getHeight()
-					+ (pos >= 2 ? 1 : 0) * procedure.getHeight()
-					+ (pos >= 3 ? 1 : 0) * closeUp.getHeight()
-					+ (pos >= 4 ? 1 : 0) * tools.getHeight()
-					+ (pos >= 5 ? 1 : 0) * pictures.getHeight()
-					- clickedWB.getHeight() + y;
-		} else {
-			y_absolue = (int) (70 + 30 * pos
-					+ ((pos >= 0 ? 0.5 : 0) + (pos >= 1 ? 0.5 : 0))
-					* warnings.getHeight()
-					+ ((pos >= 1 ? 0.5 : 0) + (pos >= 2 ? 0.5 : 0))
-					* jobSetUp.getHeight()
-					+ ((pos >= 2 ? 0.5 : 0) + (pos >= 3 ? 0.5 : 0))
-					* procedure.getHeight()
-					+ ((pos >= 3 ? 0.5 : 0) + (pos >= 4 ? 0.5 : 0))
-					* closeUp.getHeight()
-					+ ((pos >= 4 ? 0.5 : 0) + (pos >= 5 ? 0.5 : 0))
-					* tools.getHeight() + (pos >= 5 ? 0.5 : 0)
-					* pictures.getHeight());
-		}
-		displayInfobulle(y_absolue - scrollView.getScrollY());
-	}
-
-	private void displayInfobulle(final int y) {
-		runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
-						infobulle.getLayoutParams());
-				if (y < ymin) {
-					infobulle.setImageResource(R.drawable.fleche_haut);
-					separator_up.setVisibility(View.INVISIBLE);
-					params.topMargin = ymin - yinfobulle / 3;
-				} else if (y > ymax) {
-					infobulle.setImageResource(R.drawable.fleche_bas);
-					separator_down.setVisibility(View.INVISIBLE);
-					params.topMargin = ymax - yinfobulle / 3;
-				} else {
-					infobulle.setImageResource(R.drawable.infobulle);
-					separator_up.setVisibility(View.VISIBLE);
-					separator_down.setVisibility(View.VISIBLE);
-					params.topMargin = y - yinfobulle / 3;
-				}
-				infobulle.setLayoutParams(params);
-			}
-		});
-	}
-
 	public void onAnnexeClic(WebView webView, String annexe) {
-		Log.i("AMMAnnexes", "Clic Annexe : " + annexe);
 		switch (state) {
 		case NOT_DISPLAYED:
-			hideSeparator();
 			this.annexe = annexe;
 			clickedWB = webView;
 			scrollX = scrollView.getScrollX();
@@ -723,9 +577,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 			public void run() {
 				ymax = layout.getHeight();
 				xmax = layout.getWidth();
-				xmin = xmax / 4;
-				ymin = 0;
-				x = xmax / 2;
 			}
 		}
 		t.schedule(new SetMax(), t2);
@@ -740,7 +591,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		map.put("img", String.valueOf(R.drawable.close));
 		map.put("webview", null);
 		listItem.add(map);
-		nb_annexe = 0;
 		setAnnexeX(xmax + xseparator / 3);
 		mDrawerLayout.setDrawerLockMode(1, Gravity.END);
 		state = AnnexesState.NOT_DISPLAYED;
@@ -750,11 +600,8 @@ public class JobCard extends Activity implements PropertyChangeListener,
 	// suivant la prÃ¨sence d'autres annexes
 	private void supprimeElt(String titre, WebView wb) {
 		if (listItem.size() != 2) {
-			Log.e("SupprimeElt",
-					"Indice de l'item : " + trouveDansListe(titre, wb));
 			int indice = trouveDansListe(titre, wb);
 			listItem.remove(indice - 1);
-			nb_annexe--;
 			listview.invalidateViews();
 			int position = 1;
 			listview.performItemClick(
@@ -763,7 +610,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		} else {
 			listItem.remove(trouveDansListe(titre, wb) - 1);
 			listview.invalidateViews();
-			nb_annexe--;
 			setAnnexeX(xmax + xseparator / 3);
 			mDrawerLayout.setDrawerLockMode(1, Gravity.END);
 			state = AnnexesState.NOT_DISPLAYED;
@@ -782,11 +628,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 			numero++;
 		}
 		return numero;
-	}
-
-	// Teste si l'objet de titre titre est l'annexe affichée actuellement
-	private boolean testeActuel(String titre, WebView wb) {
-		return (titre.equals(titreAnnexe.getText().toString()) && clickedWB == wb);
 	}
 
 	// Teste si l'objet de titre titre est dans la listview
@@ -816,8 +657,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 							"titre" }, new int[] { R.id.listImage,
 							R.id.listTitreAnnexe });
 			listview.setAdapter(mSchedule);
-			// +1 annexe
-			nb_annexe++;
 		}
 	}
 
@@ -1065,11 +904,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 		v.startAnimation(a);
 	}
 
-	private boolean isCollapsed(int icon) {
-		return Integer.parseInt(((ImageView) findViewById(icon)).getTag()
-				.toString()) == R.drawable.collapse;
-	}
-
 	@Override
 	public void onBackPressed() {
 		super.onBackPressed();
@@ -1077,7 +911,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 
 	@Override
 	public void propertyChange(PropertyChangeEvent event) {
-		Log.e("Dans propertyChange", "Cool");
 		if (event.getNewValue().equals("FULLSCREEN")) {
 			fullScreenAnnexButton.performClick();
 		}
@@ -1125,8 +958,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webView1);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background1_light));
 				h.mButton = (Button) arg1.findViewById(R.id.Ok);
@@ -1246,8 +1077,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webViewPrevious);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background2_light));
 
@@ -1359,8 +1188,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webView1);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background1_light));
 				h.mButton = (Button) arg1.findViewById(R.id.Ok);
@@ -1481,8 +1308,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webViewPrevious);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background2_light));
 
@@ -1595,8 +1420,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webView1);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background1_light));
 				h.mButton = (Button) arg1.findViewById(R.id.Ok);
@@ -1716,8 +1539,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webViewPrevious);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background2_light));
 
@@ -1830,8 +1651,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webView1);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background1_light));
 				h.mButton = (Button) arg1.findViewById(R.id.Ok);
@@ -1952,8 +1771,6 @@ public class JobCard extends Activity implements PropertyChangeListener,
 				h.mWV = (WebView) arg1.findViewById(R.id.webViewPrevious);
 				h.mWV.setWebViewClient(taskManager);
 				h.mWV.getSettings().setJavaScriptEnabled(true);
-				h.mWV.addJavascriptInterface(new JavaScriptInterface(
-						JobCard.this), "MyAndroid");
 				h.mWV.setBackgroundColor(getResources().getColor(
 						R.color.background2_light));
 
